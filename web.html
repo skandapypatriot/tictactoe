@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e6f7ff; /* Light blue background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      text-align: center;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #0077b6; /* Darker blue for the title */
+    }
+
+    .view-counter {
+      margin-bottom: 20px;
+      color: #0077b6;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+      margin: 20px auto;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #f0f8ff; /* Light blue cell background */
+      border: 2px solid #0077b6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      color: #0077b6;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .cell:hover {
+      background-color: #cceeff; /* Slightly darker blue on hover */
+    }
+
+    #reset-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      color: #ffffff;
+      background-color: #0077b6;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #reset-button:hover {
+      background-color: #005f8a; /* Darker blue on hover */
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      color: #0077b6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tic-Tac-Toe</h1>
+    <div class="view-counter">Views: <span id="view-count">0</span></div>
+    <div class="board">
+      <div class="cell" data-index="0"></div>
+      <div class="cell" data-index="1"></div>
+      <div class="cell" data-index="2"></div>
+      <div class="cell" data-index="3"></div>
+      <div class="cell" data-index="4"></div>
+      <div class="cell" data-index="5"></div>
+      <div class="cell" data-index="6"></div>
+      <div class="cell" data-index="7"></div>
+      <div class="cell" data-index="8"></div>
+    </div>
+    <div class="result" id="result"></div>
+    <button id="reset-button">Reset Game</button>
+  </div>
+
+  <script>
+    // View counter using localStorage
+    let viewCount = localStorage.getItem('viewCount') || 0;
+    viewCount++;
+    localStorage.setItem('viewCount', viewCount);
+    document.getElementById('view-count').textContent = viewCount;
+
+    // Game logic
+    const cells = document.querySelectorAll('.cell');
+    const resetButton = document.getElementById('reset-button');
+    const resultDisplay = document.getElementById('result');
+    let currentPlayer = 'X';
+    let gameState = ['', '', '', '', '', '', '', '', ''];
+    let gameActive = true;
+
+    const winningConditions = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+      [0, 4, 8], [2, 4, 6]             // Diagonals
+    ];
+
+    const handleCellClick = (event) => {
+      const clickedCell = event.target;
+      const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+      if (gameState[clickedCellIndex] !== '' || !gameActive) return;
+
+      gameState[clickedCellIndex] = currentPlayer;
+      clickedCell.textContent = currentPlayer;
+
+      checkForWinner();
+      switchPlayer();
+    };
+
+    const checkForWinner = () => {
+      for (let condition of winningConditions) {
+        const [a, b, c] = condition;
+        if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+          gameActive = false;
+          resultDisplay.textContent = `Player ${currentPlayer} wins!`;
+          return;
+        }
+      }
+
+      if (!gameState.includes('')) {
+        gameActive = false;
+        resultDisplay.textContent = 'It\'s a draw!';
+      }
+    };
+
+    const switchPlayer = () => {
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    };
+
+    const resetGame = () => {
+      gameState = ['', '', '', '', '', '', '', '', ''];
+      gameActive = true;
+      currentPlayer = 'X';
+      cells.forEach(cell => cell.textContent = '');
+      resultDisplay.textContent = '';
+    };
+
+    cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+    resetButton.addEventListener('click', resetGame);
+  </script>
+</body>
+</html>
